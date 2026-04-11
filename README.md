@@ -5,10 +5,19 @@ Serves a 20-router REST surface covering backtesting, factor research,
 strategy runs, risk analytics, audit reports, and an in-browser
 code IDE for custom strategies.
 
-> Companion repos:
-> [`kuant-core`](https://github.com/zwmjj/kuant-core) — research library.
-> [`kuant-strategies`](https://github.com/zwmjj/kuant-strategies) — 25+ strategies.
-> [`kuant-web`](https://github.com/zwmjj/kuant-web) — Next.js frontend.
+## Ecosystem
+
+This is one of **six open-source repositories** that together form a
+complete quant research platform. Total ~55,000 LOC, MIT licensed.
+
+| Repo | Role | LOC |
+|---|---|---|
+| [`alt-data-research`](https://github.com/zwmjj/alt-data-research) ⭐ | SEC NLP + 13F alt-data alpha — **t-stat 2.11, ICIR 0.80** | ~2.5k |
+| [`kuant-research`](https://github.com/zwmjj/kuant-research) | 14 reproducible empirical studies with committed expected outputs | ~3k |
+| [`kuant-core`](https://github.com/zwmjj/kuant-core) | Production quant research library — 28+ factors, walk-forward CV, 5 cost models, US + CN A-share | ~20k |
+| [`kuant-strategies`](https://github.com/zwmjj/kuant-strategies) | 25+ strategies built on kuant-core: momentum, mean-rev, crypto, options, ML, alt-data | ~17k |
+| **`kuant-api`** (this repo) | FastAPI research backend — 20 routers, Monaco IDE, WebSocket, JWT auth | ~5k |
+| [`kuant-web`](https://github.com/zwmjj/kuant-web) | Next.js 16 + Tailwind + Recharts dashboard — 20 panels | ~7k |
 
 ## Routers (20)
 
