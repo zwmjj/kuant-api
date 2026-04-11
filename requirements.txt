@@ -1,0 +1,18 @@
+fastapi>=0.100
+uvicorn[standard]>=0.20
+pydantic>=2.0
+python-jose[cryptography]>=3.3
+passlib[bcrypt]>=1.7
+python-multipart>=0.0.6
+
+numpy>=1.24
+pandas>=2.0,<2.3
+scipy>=1.10
+
+# Research library this API serves
+# kuant-core>=0.3
+
+# Optional — only needed if you plug in the live-data routers
+# alpaca-py>=0.30
+# wrds>=3.4
+# yfinance>=0.2
