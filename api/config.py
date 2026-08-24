@@ -4,14 +4,39 @@ Secrets and user credentials are loaded from environment variables at
 runtime. Set them in .env (gitignored) or inject via your deployment
 platform's secret manager. See .env.example for the required variables.
 
-No secrets are hardcoded in this file. In development, defaults are
-derived from env vars — in production, deploy with real secrets set
-at the environment layer (K8s secrets, AWS Parameter Store, etc).
+This file used to claim "No secrets are hardcoded in this file." That was
+not true in the way that matters. `SECRET_KEY` fell back to a fixed string
+committed in this public repository, and `USERS` fell back to demo/demo.
+Neither is a secret in any useful sense: an instance deployed without the
+environment variables set signs its tokens with a key any reader of this
+repo can look up, so anyone could forge a valid token for any username,
+and the demo account would accept a password that is also public.
+
+The fallbacks are still here, because local development needs something to
+work against. What has changed is that they no longer engage silently:
+using either one now requires setting KUANT_API_ALLOW_INSECURE_DEV=1,
+and the process refuses to start otherwise.
 """
 import hashlib
 import os
 
-SECRET_KEY = os.environ.get("KUANT_API_SECRET_KEY", "dev-only-secret-do-not-use-in-prod")
+# Opt-in switch for the insecure development fallbacks below.
+ALLOW_INSECURE_DEV = os.environ.get("KUANT_API_ALLOW_INSECURE_DEV", "").strip() in {"1", "true", "yes"}
+
+_DEV_SECRET_KEY = "dev-only-secret-do-not-use-in-prod"
+
+SECRET_KEY = os.environ.get("KUANT_API_SECRET_KEY", "")
+if not SECRET_KEY:
+    if not ALLOW_INSECURE_DEV:
+        raise RuntimeError(
+            "KUANT_API_SECRET_KEY is not set. Tokens would be signed with a key "
+            "that is published in this repository, so anyone could forge one. "
+            "Set KUANT_API_SECRET_KEY to a random value in your deployment's "
+            "environment, or set KUANT_API_ALLOW_INSECURE_DEV=1 to run locally "
+            "with the known development key."
+        )
+    SECRET_KEY = _DEV_SECRET_KEY
+
 DEFAULT_START = "2015-01-01"
 
 
@@ -31,7 +56,16 @@ def _load_users() -> dict:
                 name, hsh = pair.split(":", 1)
                 out[name.strip()] = hsh.strip()
         return out
-    # Dev fallback — do NOT use in production. Hash is for the password "demo".
+    # Development fallback: username "demo", password "demo". Both are public,
+    # so this is an open door, not an account. It engages only behind the
+    # explicit KUANT_API_ALLOW_INSECURE_DEV opt-in.
+    if not ALLOW_INSECURE_DEV:
+        raise RuntimeError(
+            "KUANT_API_USERS is not set. The only account would be demo/demo, "
+            "whose password is published in this repository. Set KUANT_API_USERS "
+            'as "name:<sha256 of password>,..." or set '
+            "KUANT_API_ALLOW_INSECURE_DEV=1 to run locally with the demo account."
+        )
     return {"demo": _hash("demo")}
 
 
